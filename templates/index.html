@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>旅トモ｜旅行プラン相談</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="hero">
+  <p class="eyebrow">TRAVEL PLAN ADVISER</p>
+  <h1>旅トモ <span>✈</span></h1>
+  <p>友達との旅行、行き先や過ごし方を一緒に考えよう。</p>
+</header>
+<main>
+  <section class="panel">
+    <h2>旅行のことを教えてください</h2>
+    <p class="sub">答えを選ぶと、おすすめの旅行プランを提案します。</p>
+    <form method="post">
+      <label>行きたい場所
+        <select name="destination">
+          {% for destination in destinations %}
+          <option value="{{ destination }}" {% if plan and plan.destination == destination %}selected{% endif %}>{{ destination }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>旅行の日数
+        <select name="days">
+          {% for n in range(1, 6) %}
+          <option value="{{ n }}" {% if plan and plan.days == n %}selected{% endif %}>{{ n }}日間</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>予算
+        <select name="budget">
+          {% for b in ["節約", "普通", "少しぜいたく"] %}
+          <option {% if plan and plan.budget == b %}selected{% endif %}>{{ b }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>誰と行きますか？
+        <select name="companions">
+          {% for c in ["友達", "家族", "恋人", "一人"] %}
+          <option {% if plan and plan.companions == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <fieldset>
+        <legend>興味があること（複数選択できます）</legend>
+        {% for item in ["観光", "グルメ", "買い物", "自然", "写真"] %}
+        <label class="check"><input type="checkbox" name="interests" value="{{ item }}"> {{ item }}</label>
+        {% endfor %}
+      </fieldset>
+      <button type="submit">おすすめプランを見る</button>
+    </form>
+  </section>
+
+  {% if plan %}
+  <section class="result">
+    <p class="eyebrow">YOUR TRAVEL PLAN</p>
+    <h2>{{ plan.destination }} {{ plan.days }}日間のおすすめプラン</h2>
+    <p>{{ plan.intro }}</p>
+    {% for day in plan.itinerary %}
+    <article class="day">
+      <h3>DAY {{ day.day }}</h3>
+      <p>{{ day.note }}</p>
+      <ul>
+      {% for spot in day.spots %}
+        <li><b>{{ spot[2] }}｜{{ spot[0] }}</b><br>{{ spot[1] }}</li>
+      {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+    <div class="extra">
+      <h3>おすすめグルメ</h3><p>{{ plan.food }}</p>
+      <h3>旅行のアドバイス</h3>
+      <ul>{% for tip in plan.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+    </div>
+    <p class="notice">※このプランはサンプル提案です。営業時間・交通手段・料金は出発前に確認してください。</p>
+  </section>
+  {% endif %}
+</main>
+<footer>旅トモ — 旅行の計画をもっと楽しく。</footer>
+</body>
+</html>
